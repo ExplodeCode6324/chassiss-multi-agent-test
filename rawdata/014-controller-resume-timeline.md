@@ -116,4 +116,19 @@
 
 ## 收尾结果
 
-- 最终 Owner apply、GitHub publish、Monitor 停止和临时 Owner 凭据回收由后续终止记录补充。
+- 第一轮 Owner 归档 apply：
+  - owner change：`OWN-c7d0f275d6d2ee0f4b7d9cc0`
+  - revision：`18→19`
+  - baseline：`2c297ddcdb35ed040dbd7260ec9d364e8f54e22c`
+  - changed files：仅 `rawdata/**`
+  - verify：integrity valid、Git clean
+- Orchestrator 经 CLI `publish check --target github` 得到 `status=ready`，随后 `publish apply`：
+  - publish id：`PUB-4758aad37849e753131ccf13`
+  - revision：`19→20`
+  - target：`origin/main`
+  - head：`2c297ddcdb35ed040dbd7260ec9d364e8f54e22c`
+  - 未直接执行 `git push`
+- 发布后 local HEAD、main、origin/main、GitHub remote main 全部等于 `2c297dd...`；integrity valid、Git clean、phase idle。
+- GitHub Monitor 最终轮询将远端推进归因为上述本地受控 publish；整个窗口没有无法归因的外部更新、pull、分叉、merge conflict 或历史重写。监控于 `2026-07-24T07:56:39Z` 停止。
+- Orchestrator/Developer、GitHub Monitor、SSH keeper 均已完成并停止；最终逐时日志在本归档中。
+- 本文件之后的最终日志回填由第二次 Owner apply 留存于 CHASSISS `owner history`；临时 Owner 凭据将在回填后由 Root 回收。

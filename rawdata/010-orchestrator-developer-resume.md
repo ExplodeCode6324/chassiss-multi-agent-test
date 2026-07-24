@@ -645,3 +645,142 @@ recover 成功 recovered=true/revision=16；acceptance 重试成功，revision 1
 ```
 
 截至 `2026-07-24T15:43:43+08:00`，等待 Master 接受 Mission。
+
+## 2026-07-24T15:44:00+08:00 — Mission 接受通知
+
+收到父代理 `/root`：
+
+```text
+Root 已按 CLI context 于 revision 17 接受 M001，当前 revision 18、phase idle、baseline 514352451f56112178e6ed4e60a67b32e949b850。保持待命，等待 Rawdata Owner 维护变更完成。
+```
+
+本代理本轮完成状态：
+
+```text
+Orchestrator acceptance evidence 已提交；M001 的最终接受由 Root 使用其独立 role credential 完成。
+```
+
+## 2026-07-24T15:52:00+08:00 — Rawdata Owner 基线通知与发布指令
+
+收到父代理 `/root`：
+
+```text
+Mission 已接受，rawdata 已由 Owner apply 纳入 revision 19 正式基线 2c297ddcdb35ed040dbd7260ec9d364e8f54e22c，trust_revision 6，Git clean。要求 fresh bootstrap/status/verify，publish check --target github；preflight 明确通过后才可 fresh bootstrap + publish apply；发布后再次验证并只读确认 origin/main。
+```
+
+重新完整读取 `/Users/muy/.codex/skills/chassiss/SKILL.md` 成功，继续只使用捆绑 darwin-arm64 CLI。
+
+## 2026-07-24T15:53:00+08:00 — 发布前 fresh bootstrap/status/verify
+
+Fresh bootstrap 核心结果：
+
+```json
+{
+  "ok": true,
+  "project_id": "PRJ-5c09b275ce3b4a2538ca7380",
+  "revision_before": 19,
+  "revision_after": 19,
+  "result": {
+    "state_revision": 19,
+    "trust_revision": 6,
+    "principal": {"actor": "developer-1", "role": "orchestrator"},
+    "available_actions": [],
+    "context_requests": []
+  }
+}
+```
+
+Status：
+
+```json
+{"api_version":"chassiss.dev/v2","ok":true,"command":"status","project_id":"PRJ-5c09b275ce3b4a2538ca7380","revision_before":19,"revision_after":19,"result":{"active_mission":"","active_tasks":[],"baseline":"2c297ddcdb35ed040dbd7260ec9d364e8f54e22c","blocked_tasks":[],"last_owner_change_id":"OWN-c7d0f275d6d2ee0f4b7d9cc0","mode":"brownfield","owner_change_count":1,"phase":"idle","ready_tasks":[],"review_tasks":[],"revision":19,"root":"/Users/muy/Desktop/Codex_Work/chassiss-multi-agent-test","trust_revision":6}}
+```
+
+Verify：
+
+```json
+{"api_version":"chassiss.dev/v2","ok":true,"command":"verify","project_id":"PRJ-5c09b275ce3b4a2538ca7380","revision_before":19,"revision_after":19,"result":{"credential_anchor":{"actor":"developer-1","id":"CRED-6cd4a28878715a13667bd7c8","role":"orchestrator","valid":true},"event_revision":19,"git_clean":true,"git_status":"","integrity":"valid","root_fingerprint":"ed25519:6d027946728f1d9447557fd0057959f8cdb44c7ffbb2350644cee9e57b3ea413"}}
+```
+
+## 2026-07-24T15:54:00+08:00 — Publish preflight
+
+命令：
+
+```text
+chassiss --json --root <project> --credential <orchestrator> publish check --target github
+```
+
+CLI 原始结果：
+
+```json
+{"api_version":"chassiss.dev/v2","ok":true,"command":"publish check","project_id":"PRJ-5c09b275ce3b4a2538ca7380","revision_before":19,"revision_after":19,"result":{"target":"github","remote":"origin","remote_url_digest":"sha256:6fc496249a525f38d93fc8c97eab841d6741141b35b22f117e6f3c0f3aea962e","branch":"main","local_head":"2c297ddcdb35ed040dbd7260ec9d364e8f54e22c","remote_head":"e39ab6438dde088b0a4f8cf2f07e8599cb602493","status":"ready"}}
+```
+
+Preflight 明确为 `ready`，并由 CLI 解析唯一目标 `origin/main`。没有指定或发布其他分支。
+
+## 2026-07-24T15:54:18+08:00 — Publish apply
+
+Preflight 后 fresh bootstrap 确认 revision 仍为 19。`publish apply` 存在于 Orchestrator principal action 与 capability schema；fresh bootstrap 的 `available_actions` 为空。根据控制端的显式发布授权、通过的 preflight 与 skill “仅使用 capability schema、优先 available actions”的规则，使用 fresh revision 交由 CLI 再次完整校验。
+
+命令：
+
+```text
+chassiss --json --root <project> --credential <orchestrator> --expect-revision 19 publish apply --target github
+```
+
+CLI 原始结果：
+
+```json
+{"api_version":"chassiss.dev/v2","ok":true,"command":"publish apply","project_id":"PRJ-5c09b275ce3b4a2538ca7380","revision_before":19,"revision_after":20,"result":{"id":"PUB-4758aad37849e753131ccf13","target":"github","remote":"origin","remote_url_digest":"sha256:6fc496249a525f38d93fc8c97eab841d6741141b35b22f117e6f3c0f3aea962e","branch":"main","previous_remote_head":"e39ab6438dde088b0a4f8cf2f07e8599cb602493","head":"2c297ddcdb35ed040dbd7260ec9d364e8f54e22c","published_by":"developer-1","created_at":"2026-07-24T07:54:33.123441Z"}}
+```
+
+未直接执行 Git push。
+
+## 2026-07-24T15:55:00+08:00 — 发布后验证
+
+Fresh bootstrap：
+
+```text
+state_revision=20
+trust_revision=6
+available_actions=[]
+context_requests=[]
+```
+
+Status：
+
+```json
+{"api_version":"chassiss.dev/v2","ok":true,"command":"status","project_id":"PRJ-5c09b275ce3b4a2538ca7380","revision_before":20,"revision_after":20,"result":{"active_mission":"","active_tasks":[],"baseline":"2c297ddcdb35ed040dbd7260ec9d364e8f54e22c","blocked_tasks":[],"last_owner_change_id":"OWN-c7d0f275d6d2ee0f4b7d9cc0","mode":"brownfield","owner_change_count":1,"phase":"idle","ready_tasks":[],"review_tasks":[],"revision":20,"root":"/Users/muy/Desktop/Codex_Work/chassiss-multi-agent-test","trust_revision":6}}
+```
+
+Verify：
+
+```json
+{"api_version":"chassiss.dev/v2","ok":true,"command":"verify","project_id":"PRJ-5c09b275ce3b4a2538ca7380","revision_before":20,"revision_after":20,"result":{"credential_anchor":{"actor":"developer-1","id":"CRED-6cd4a28878715a13667bd7c8","role":"orchestrator","valid":true},"event_revision":20,"git_clean":true,"git_status":"","integrity":"valid","root_fingerprint":"ed25519:6d027946728f1d9447557fd0057959f8cdb44c7ffbb2350644cee9e57b3ea413"}}
+```
+
+只读本地 refs：
+
+```text
+git rev-parse HEAD refs/heads/main refs/remotes/origin/main
+2c297ddcdb35ed040dbd7260ec9d364e8f54e22c
+2c297ddcdb35ed040dbd7260ec9d364e8f54e22c
+2c297ddcdb35ed040dbd7260ec9d364e8f54e22c
+```
+
+只读 GitHub remote ref：
+
+```text
+git ls-remote origin refs/heads/main
+2c297ddcdb35ed040dbd7260ec9d364e8f54e22c refs/heads/main
+```
+
+结论：本地 HEAD、本地 main、remote-tracking origin/main、GitHub `refs/heads/main` 均精确等于正式基线 `2c297ddcdb35ed040dbd7260ec9d364e8f54e22c`。
+
+跨代理同步给 `/root`：
+
+```text
+publish check status=ready；publish apply 成功，revision 19→20，PUB-4758aad37849e753131ccf13，published head=2c297ddc...；正在完成最终验证。
+```
+
+截至 `2026-07-24T15:55:35+08:00`，发布阶段完成。

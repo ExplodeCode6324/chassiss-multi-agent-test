@@ -165,3 +165,27 @@ SSH Keeper → Root：Hermes、SSH 和 wrapper 均正常退出，tmux chassiss-f
 ```
 
 - 最终 Owner apply、publish、Monitor 停止消息在终止阶段补入。
+
+## 026 — Root → Orchestrator/Developer：发布正式基线
+
+```text
+rawdata 已由 Owner apply 纳入 revision19 正式基线 2c297ddcdb35ed040dbd7260ec9d364e8f54e22c。fresh bootstrap/status/verify；执行 publish check --target github。只有 preflight 明确通过时，用 fresh revision 执行 publish apply --target github 到默认 origin/main；不得直接 git push 或发布其他分支。发布后核验本地与远端 refs，并追加日志。
+```
+
+## 027 — Orchestrator/Developer → Root：发布成功
+
+```text
+publish check status=ready；publish apply 成功，revision19→20，Publish ID PUB-4758aad37849e753131ccf13，published commit 2c297ddcdb35ed040dbd7260ec9d364e8f54e22c 到 origin/main。post-status phase idle；verify integrity valid、Git clean、credential anchor valid。本地 HEAD/main/origin-main 与 remote main 精确一致。未直接 git push，未发布其他分支。
+```
+
+## 028 — Root → GitHub Monitor：最终轮询并停止
+
+```text
+Orchestrator 已通过 CHASSISS publish apply 发布 revision20/baseline2c297dd。立即进行最终只读 fetch/refs/CLI baseline 核验，判断远端推进来源，记录整个窗口是否有外部更新、拉取、分叉或冲突，然后停止五分钟监控。
+```
+
+## 029 — GitHub Monitor → Root：最终结果
+
+```text
+local HEAD、CLI baseline、origin/main、remote main 全部为 2c297ddcdb35ed040dbd7260ec9d364e8f54e22c；5143524→2c297dd 是单提交 fast-forward，归因为已知 CHASSISS publish，不是外部更新。整个窗口未发现外部更新、未 pull、无 Git 分叉/合并冲突；两次 HTTPS connection reset 均重试恢复。监控于 07:56:39Z 停止，未使用任何角色密钥。
+```

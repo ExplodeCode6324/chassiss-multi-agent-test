@@ -79,3 +79,57 @@
   - 判断：`5143524...` 是受控迁移后本地 CLI 正式 integration 基线推进；远端 `main` 未推进，故不存在非本地远端更新。
   - 动作：仅 fetch；未执行 pull、commit、push、merge 或历史重写；未触发 ELIZA 证据检查通知。
 - `2026-07-24T07:40:32Z` 跨代理消息：向 `/root` 报告恢复后首轮结果，明确区分本地 integration 基线与未变化的远端 `main`；继续监控。
+- `2026-07-24T07:45:57Z` 恢复后的第二轮（fetch 前）：
+  - local HEAD/正式 CLI 基线：`514352451f56112178e6ed4e60a67b32e949b850`
+  - remote-tracking `origin/main`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - 工作树含九个未跟踪的 `rawdata/005...013` 联调归档文件；`main...origin/main [ahead 6]`。
+  - 本地 heads 和 remote-tracking refs 未变化。
+  - 首次 `git ls-remote --heads origin` 失败：`Recv failure: Connection reset by peer`。
+- `2026-07-24T07:46:22Z` 恢复后的第二轮（重试 `git fetch --prune origin` 后）：
+  - fetch 重试成功。
+  - local HEAD 仍为 `514352451f56112178e6ed4e60a67b32e949b850`，remote `main` 仍为 `e39ab6438dde088b0a4f8cf2f07e8599cb602493`。
+  - GitHub 远端 heads 仍仅为两个已知基线分支。
+  - 判断：没有非本地远端更新；未跟踪 rawdata 文件是本地工作树变化，不是 GitHub 更新。
+  - 动作：仅 fetch 重试；工作树不干净且远端无变化，未执行 pull；未提交、发布、merge 或改写历史。
+- `2026-07-24T07:46:44Z` 跨代理消息：向 `/root` 报告第二轮连接重置后重试成功、远端无变化，以及本地未跟踪 rawdata 文件不属于远端更新。
+- `2026-07-24T07:51:46Z` 恢复后的第三轮（fetch 前）：
+  - local HEAD/正式 CLI 基线：`514352451f56112178e6ed4e60a67b32e949b850`
+  - remote `main`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - 工作树不干净：`rawdata/README.md` 已修改，并有 `rawdata/005...016` 联调归档文件未跟踪。
+  - 其余本地 heads、remote-tracking refs 和 GitHub 远端 heads 未变化。
+- `2026-07-24T07:52:02Z` 恢复后的第三轮（`git fetch --prune origin` 后）：
+  - local HEAD/正式 CLI 基线仍为 `514352451f56112178e6ed4e60a67b32e949b850`。
+  - remote `main` 仍为 `e39ab6438dde088b0a4f8cf2f07e8599cb602493`。
+  - 判断：没有非本地远端更新；工作树变化均属于本地联调归档整理。
+  - 动作：仅 fetch；未 pull、提交、发布、merge 或改写历史。
+- `2026-07-24T07:52:26Z` 跨代理消息：向 `/root` 报告第三轮远端无变化、本地 rawdata 归档整理仍在进行；继续监控。
+- `2026-07-24T07:56:19Z` 收到 `/root` 最终核验指令并执行最终轮询（fetch 前）：
+  - `/root` 明确说明 Orchestrator 已通过 CHASSISS `publish apply` 发布 revision 20，正式基线为 `2c297ddcdb35ed040dbd7260ec9d364e8f54e22c`。
+  - 工作树：`main...origin/main`，干净。
+  - local HEAD/CLI 正式基线 `main`：`2c297ddcdb35ed040dbd7260ec9d364e8f54e22c`
+  - remote-tracking 与 GitHub remote `main`：`2c297ddcdb35ed040dbd7260ec9d364e8f54e22c`
+  - 行政归档分支仍为 `ba086158c1729b97f938763bbbb45c97ff38005c`；本地任务分支仍为 `3efd2a8a68281a5844f57a205fb0cfc4edb4fcc4`。
+- `2026-07-24T07:56:39Z` 最终轮询（`git fetch --prune origin` 后）：
+  - fetch 前后 refs 完全一致；local HEAD、CLI baseline、`origin/main` 与 GitHub remote `main` 均为 `2c297ddcdb35ed040dbd7260ec9d364e8f54e22c`。
+  - `514352451f56112178e6ed4e60a67b32e949b850` 是 `2c297dd...` 的祖先，二者之间恰有一个提交：`Owner baseline: Adopt Master-requested, timestamped and secret-scanned multi-agent joint-test raw data, including pr`。
+  - 判断：该远端推进是已知本地 Orchestrator/CHASSISS 受控 publish 的结果，不属于非本地外部更新。
+  - 动作：仅最终 fetch 和只读祖先关系核验；未执行 pull、commit、push、merge 或历史重写。
+
+## 最终监控摘要
+
+- 总监控窗口：`2026-07-24T06:52:46Z` 至 `2026-07-24T07:56:39Z`。
+- 受控迁移暂停窗口：`2026-07-24T07:11:46Z` 至 `2026-07-24T07:39:40Z`；暂停期间未对项目执行 fetch/pull，未修改 `.git` 或工作树。
+- 第一轮（`06:52:46Z–06:53:19Z`）：`main=e39ab643...`、行政归档分支 `ba086158...`，无变化。
+- 第二轮（`06:58:54Z–06:59:08Z`）：远端无变化；本地 CLI 接受需求、架构与任务，`main` 推进到 `cf9cc33...`。
+- 第三轮（`07:04:48Z–07:05:06Z`）：远端无变化；本地接受任务基线 `9a665d7...` 并创建任务分支。
+- 第四轮（`07:10:41Z–07:11:18Z`）：远端无变化；本地任务分支推进到实现提交 `3efd2a8...`。
+- 恢复后第一轮（`07:39:40Z–07:40:04Z`）：远端仍为 `e39ab643...`；本地受控 integration 基线为 `5143524...`。
+- 恢复后第二轮（`07:45:57Z–07:46:22Z`）：远端无变化；一次 `ls-remote` 连接重置，fetch 重试成功；本地开始整理 rawdata。
+- 恢复后第三轮（`07:51:46Z–07:52:02Z`）：远端无变化；本地继续整理 rawdata。
+- 最终轮（`07:56:19Z–07:56:39Z`）：local HEAD/CLI baseline/remote `main` 全部收敛到受控 publish 基线 `2c297dd...`。
+- 外部更新：未发现任何无法归因于本地 CLI/Orchestrator 受控流程的远端更新或分支。
+- 拉取：未执行 `git pull`；不存在需要安全 ff-only 拉取的外部更新。
+- 冲突：未发生 Git 分叉、合并冲突、版本冲突或历史重写。仅出现过 GitHub HTTPS `Connection reset by peer`，均在重试后恢复。
+- 通知：因未发现非本地外部更新，没有触发 `/root/orchestrator_developer` 的 ELIZA 证据检查通知；各轮状态与暂停/恢复情况均已通知 `/root`。
+- 权限与凭据：未读取、索要或使用任何 CHASSISS 角色密钥；未记录 GitHub token。
+- `2026-07-24T07:56:39Z` 五分钟监控正式停止。
