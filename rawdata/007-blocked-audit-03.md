@@ -104,3 +104,11 @@ GitHub connector：
 - 远端没有 ELIZA 或其他控制端状态可拉取。
 
 继续开发必须发生外部状态变化：提供与目标项目匹配的 Master Root/完整 `.chassis` 控制状态，或者用新 Root 初始化并重新签发同一项目下的全套兼容角色凭据。故在第三次连续审计后正式判定目标 blocked。
+
+## 归档发布
+
+- 归档分支：`agent/archive-blocked-audit`
+- 归档提交：`49baca7`
+- GitHub 连接器创建 Draft PR 返回 `403 Resource not accessible by integration`。
+- 按 GitHub publish skill 的回退规则，使用已认证 `gh` 成功创建 Draft PR `#1`。
+- 该 403 是连接器授权范围问题，没有扩大权限、重试写入其他目标或暴露 token。
