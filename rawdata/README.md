@@ -11,6 +11,10 @@
 3. `002-orchestrator-developer.md`：兼任 Orchestrator/Developer Agent 的逐时操作原始记录。
 4. `003-github-monitor.md`：GitHub Monitor Agent 的两轮轮询原始记录。
 5. `004-subagent-conversations.md`：父子代理指令和消息的投递顺序记录。
+6. `005-continuation-02-controller.md`：第二次续跑的控制端独立审计。
+7. `006-github-monitor-continuation-02.md`：第二次续跑的两轮五分钟 GitHub 监控。
+8. `007-blocked-audit-03.md`：第三次连续阻断审计和最终 blocked 判定证据。
+9. `008-continuation-02-conversations.md`：续跑监控的父子代理消息投递顺序。
 
 ## 脱敏说明
 
@@ -21,3 +25,5 @@
 ## 测试边界
 
 测试因缺少 Master Root、项目尚未初始化且 Orchestrator armor 与 GitHub `main` 的角色策略不兼容而被 CLI 阻断。没有通过手工编辑 `.chassis/`、伪造状态、重签凭据或直接 Git 开发绕过阻断。
+
+上述同一阻断条件在原始测试和两次自动续跑中连续三轮成立。第三轮后活动目标按严格 blocked 审计规则停止。
