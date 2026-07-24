@@ -32,6 +32,7 @@
 ## 004 — 安装 GitHub 最新 skill
 
 - GitHub `main` HEAD：`33533fac821a62df28ef3054dd330d91aae4c94b`。
+- 最终检查全部远端 heads：另有 `agent/event-v2-reducer@f6c4b0e`，其提交时间为 `2026-07-23 03:03:58 +0800`，早于 `main`，且该分支移除了 Darwin 捆绑二进制；因此默认 `main` 是本次 macOS 联调可用的最新完整 skill 来源。
 - 使用 `skill-installer` 从 `ExplodeCode6324/chassiss` 的 `skills/chassiss` 安装到 `/Users/muy/.codex/skills/chassiss`。
 - 远端与本地 `SKILL.md` Git blob 均为 `7f61c1d33e1fc09f7fdf8a6fae935e6bae7fd43e`。
 - 安装后发现四个 CLI 二进制缺少执行位，首次执行返回 `permission denied`。
