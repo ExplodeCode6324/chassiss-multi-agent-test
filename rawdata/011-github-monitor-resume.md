@@ -1,0 +1,81 @@
+# CHASSISS 联调原始数据：GitHub Monitor Resume
+
+- `2026-07-24T06:52:46Z` 恢复正式监控并执行即时轮询；不读取或索要任何 CHASSISS 密钥。已知基线：
+  - `main`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - 行政归档分支 `agent/archive-blocked-audit`：`ba086158c1729b97f938763bbbb45c97ff38005c`
+- `2026-07-24T06:52:46Z` 跨代理消息：向 `/root` 确认恢复监控、采用 GitHub skill 的安全仓库流程，并把行政归档分支视为已知基线。
+- `2026-07-24T06:52:46Z` 第一轮（fetch 前）：
+  - 工作树：`main...origin/main`，干净。
+  - `refs/heads/agent/archive-blocked-audit`：`ba086158c1729b97f938763bbbb45c97ff38005c`
+  - `refs/heads/main`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - `refs/remotes/origin/HEAD`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - `refs/remotes/origin/agent/archive-blocked-audit`：`ba086158c1729b97f938763bbbb45c97ff38005c`
+  - `refs/remotes/origin/main`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - GitHub 远端 heads：`agent/archive-blocked-audit` 为 `ba086158c1729b97f938763bbbb45c97ff38005c`，`main` 为 `e39ab6438dde088b0a4f8cf2f07e8599cb602493`。
+- `2026-07-24T06:53:19Z` 第一轮（`git fetch --prune origin` 后）：
+  - 工作树：`main...origin/main`，干净。
+  - `refs/heads/agent/archive-blocked-audit`：`ba086158c1729b97f938763bbbb45c97ff38005c`
+  - `refs/heads/main`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - `refs/remotes/origin/HEAD`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - `refs/remotes/origin/agent/archive-blocked-audit`：`ba086158c1729b97f938763bbbb45c97ff38005c`
+  - `refs/remotes/origin/main`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - GitHub 远端 heads 未变化。
+  - 结论：没有发现已知基线之外的新分支或本地未包含的远端提交；未执行 pull/merge/push。
+- `2026-07-24T06:53:49Z` 跨代理消息：向 `/root` 报告第一轮完成、两个已知分支均未变化，并继续等待下一轮或停止指令。
+- `2026-07-24T06:58:54Z` 第二轮（fetch 前）：
+  - 工作树：`main...origin/main [ahead 2]`，存在未跟踪目录 `docs/missions/`。
+  - `refs/heads/agent/archive-blocked-audit`：`ba086158c1729b97f938763bbbb45c97ff38005c`
+  - `refs/heads/main`：`5e9150e3adee83355d047d9bbd167ff387d31a89`
+  - `refs/remotes/origin/HEAD`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - `refs/remotes/origin/agent/archive-blocked-audit`：`ba086158c1729b97f938763bbbb45c97ff38005c`
+  - `refs/remotes/origin/main`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - GitHub 远端 heads 仍为已知基线：`agent/archive-blocked-audit=ba086158...`，`main=e39ab643...`。
+- `2026-07-24T06:59:08Z` 第二轮（`git fetch --prune origin` 后）：
+  - 工作树：`main...origin/main [ahead 3]`，干净。
+  - `refs/heads/agent/archive-blocked-audit`：`ba086158c1729b97f938763bbbb45c97ff38005c`
+  - `refs/heads/main`：`cf9cc3398e031520c245f1f8d498c1a3edbba89d`
+  - `refs/remotes/origin/HEAD`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - `refs/remotes/origin/agent/archive-blocked-audit`：`ba086158c1729b97f938763bbbb45c97ff38005c`
+  - `refs/remotes/origin/main`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - GitHub 远端 heads 未变化。
+  - 轮询期间观察到并发本地提交：`cf9cc3398e031520c245f1f8d498c1a3edbba89d Accept mission M001`；此前本地主线上的另两个未推送提交为 `8ef0982... Accept requirements requirements` 和 `5e9150e... Accept architecture architecture`。
+  - 结论：本地主线有三个未推送提交，但没有发现基线外远端分支或本地未包含的远端提交；未执行 pull/merge/push。
+- `2026-07-24T06:59:40Z` 跨代理消息：向 `/root` 报告第二轮远端无变化，并注明轮询期间观察到并发本地主线提交；继续监控。
+- `2026-07-24T07:04:48Z` 第三轮（fetch 前）：
+  - 工作树：`main...origin/main [ahead 4]`，干净。
+  - 本地新增 `refs/heads/chassiss/m001-t001`：`9a665d727b14a6814749b8e2e06623657318fa51`
+  - `refs/heads/main` 同步推进至 `9a665d727b14a6814749b8e2e06623657318fa51`；提交摘要为 `Accept task M001-T001`。
+  - `refs/heads/agent/archive-blocked-audit`：`ba086158c1729b97f938763bbbb45c97ff38005c`
+  - remote-tracking refs 仍为 `origin/main=e39ab643...`、`origin/agent/archive-blocked-audit=ba086158...`。
+  - GitHub 远端 heads 仍仅为两个已知基线分支。
+- `2026-07-24T07:05:06Z` 第三轮（`git fetch --prune origin` 后）：
+  - 本地 heads 和 remote-tracking refs 与 fetch 前一致。
+  - GitHub 远端 heads 未变化。
+  - 结论：本地新增任务分支和提交尚未推送；没有发现基线外远端分支或本地未包含的远端提交；未执行 pull/merge/push。
+- `2026-07-24T07:05:32Z` 跨代理消息：向 `/root` 报告第三轮远端无变化及本地新增 `chassiss/m001-t001`/任务接受提交；继续监控。
+- `2026-07-24T07:10:41Z` 第四轮（fetch 前）：
+  - 工作树：`main...origin/main [ahead 4]`，干净。
+  - `refs/heads/main`：`9a665d727b14a6814749b8e2e06623657318fa51`
+  - `refs/heads/chassiss/m001-t001`：`3efd2a8a68281a5844f57a205fb0cfc4edb4fcc4`
+  - 新的本地任务分支提交摘要：`M001-T001: Implement deterministic Python ReAct Agent`。
+  - 行政归档分支及全部 remote-tracking refs 保持基线。
+  - GitHub 远端 heads 仍仅为两个已知基线分支。
+- `2026-07-24T07:11:18Z` 第四轮（`git fetch --prune origin` 后）：
+  - 所有 refs 和远端 heads 与 fetch 前一致。
+  - 结论：新的 ReAct Agent 实现提交只存在于本地 `chassiss/m001-t001`；没有基线外远端分支或本地未包含的远端提交；未执行 pull/merge/push。
+- `2026-07-24T07:11:46Z` 收到 `/root` 的受控迁移暂停指令：为完整迁移 `.chassis`/Git 快照到远端 ELIZA，暂停对本地仓库执行 fetch/pull，并且不修改 `.git` 或工作树；保持在线，等待 `/root` 或 ELIZA SSH keeper 明确通知 integration 完成且控制快照迁回。
+- `2026-07-24T07:11:46Z` 跨代理消息：确认已暂停 Git 操作并记录原因；暂停期间不执行五分钟仓库轮询。
+- `2026-07-24T07:39:40Z` 收到 `/root` 的解除暂停指令，恢复每五分钟 GitHub 只读轮询；跨代理消息确认恢复，并重申不使用角色密钥、不提交或发布。
+- `2026-07-24T07:39:40Z` 恢复后的第一轮（fetch 前）：
+  - 工作树：`main...origin/main [ahead 6]`，干净。
+  - local HEAD/正式 CLI 基线 `main`：`514352451f56112178e6ed4e60a67b32e949b850`
+  - `refs/heads/chassiss/m001-t001`：`3efd2a8a68281a5844f57a205fb0cfc4edb4fcc4`
+  - `refs/heads/agent/archive-blocked-audit`：`ba086158c1729b97f938763bbbb45c97ff38005c`
+  - remote-tracking `origin/main`：`e39ab6438dde088b0a4f8cf2f07e8599cb602493`
+  - GitHub 远端 heads 仍为 `main=e39ab643...` 与已知行政归档分支 `agent/archive-blocked-audit=ba086158...`。
+- `2026-07-24T07:40:04Z` 恢复后的第一轮（`git fetch --prune origin` 后）：
+  - 所有本地 heads、remote-tracking refs 和 GitHub 远端 heads 与 fetch 前一致。
+  - local HEAD `514352451f56112178e6ed4e60a67b32e949b850` 的摘要为 `Integrate M001-T001`；其父历史包含本地实现提交 `3efd2a8...`。
+  - 判断：`5143524...` 是受控迁移后本地 CLI 正式 integration 基线推进；远端 `main` 未推进，故不存在非本地远端更新。
+  - 动作：仅 fetch；未执行 pull、commit、push、merge 或历史重写；未触发 ELIZA 证据检查通知。
+- `2026-07-24T07:40:32Z` 跨代理消息：向 `/root` 报告恢复后首轮结果，明确区分本地 integration 基线与未变化的远端 `main`；继续监控。
