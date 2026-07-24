@@ -1,24 +1,95 @@
-# chassiss-multi-agent-test
+# Deterministic Python ReAct Agent
 
-CHASSISS multi-agent collaboration test repository.
+This repository contains a small, standard-library-only ReAct Agent. It accepts
+a documented natural-language question, makes a bounded sequence of deterministic
+policy decisions, dispatches only explicitly registered local tools, and returns
+a terminal status, answer, and immutable ordered trace.
 
-本仓库是 CHASSISS 框架的多 Agent 协作测试场。目标产品是一套小型、确定性、无外部服务依赖的 Python ReAct Agent。
+The component boundaries are:
 
-正式需求、架构、Mission 和 Task 由 Designer 通过 CHASSISS CLI 生成和提交；实现由 Orchestrator/Developer 通过 CLI 管理的任务工作树完成；远端 Reviewer ELIZA 负责复核与集成。
+- `react_agent.models`: immutable decisions, trace steps, terminal statuses, and
+  results.
+- `react_agent.tools`: safe binary arithmetic, fixed-table knowledge lookup, and
+  the explicit in-process registry.
+- `react_agent.policy`: the deterministic question grammar and next-action policy.
+- `react_agent.agent`: bounded orchestration and failure-to-result conversion.
+- `react_agent.cli`: argument parsing, trace rendering, and exit semantics.
 
-## 架构
+No external package, hosted model, network client, shell command, subprocess, or
+arbitrary Python evaluation is used.
 
-通过 `review-exchange` 分支进行提交与审核工作流：
+## Supported questions
 
-1. Developer 在 feature 分支开发，完成后提交 review request 到 `review-exchange` 分支
-2. Reviewer（ELIZA）自动轮询检测新 review request
-3. Reviewer 独立审核代码，生成审核报告
-4. 审核结果推回 `review-exchange` 分支
+Arithmetic accepts one binary expression with a numeric operand on each side:
 
-## 分支约定
+```text
+calculate 2 + 3
+what is -1.5 * 2?
+```
 
-- `main`: 稳定基线
-- `review-exchange`: 审核请求与响应的交换分支
-- `chassiss/*`: 候选分支（由 Developer 推送）
+The allowed symbols are `+`, `-`, `*`, and `/`.
 
-联调完成后，`rawdata/` 保存按时间或操作顺序排列的子智能体对话与操作原始记录。
+Knowledge lookup accepts an exact built-in key:
+
+```text
+lookup react
+lookup python
+lookup chassiss
+```
+
+Unsupported wording returns the explicit `unsupported` status. The knowledge
+table never falls back to files, environment variables, the user home directory,
+or a network service.
+
+## Python API
+
+```python
+from react_agent import run
+
+result = run("calculate 2 + 3", max_steps=5)
+print(result.status.value)  # completed
+print(result.answer)        # 5
+for step in result.trace:
+    print(step.sequence, step.phase.value, step.summary)
+```
+
+Tests can inject a `ToolRegistry` or a policy implementing `Policy.next_action`
+to reach deterministic failure paths.
+
+## Command line
+
+```bash
+python3 -m react_agent "calculate 2 + 3" --max-steps 5
+python3 -m react_agent "lookup react"
+```
+
+A completed answer exits with status code `0`. Explicit failure outcomes
+(`invalid_request`, `unknown_tool`, `invalid_arguments`, `tool_failure`,
+`policy_failure`, `max_steps`, and `unsupported`) exit with status code `2`.
+Every outcome prints its status, answer (or `-`), and numbered trace.
+
+## Verification
+
+Run the complete deterministic unit-test suite:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+Run the frozen command-line smoke test:
+
+```bash
+python3 -m react_agent "calculate 2 + 3" --max-steps 5
+```
+
+The tests include an abstract-syntax-tree safety scan of the implementation and
+exercise arithmetic success, knowledge success, ordered traces, unknown tools,
+invalid arguments, declared and unexpected tool failures, exact maximum-step
+exhaustion, unsupported inputs, and CLI rendering/exit behavior.
+
+## CHASSISS collaboration
+
+The accepted Requirements, Architecture, Mission, and Task are managed through
+the CHASSISS CLI. Development, review, integration, and publication follow the
+role-scoped CLI lifecycle. `rawdata/` contains the ordered multi-agent
+interoperability record.
